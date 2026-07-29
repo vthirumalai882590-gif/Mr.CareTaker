@@ -1,0 +1,20 @@
+{
+  "name": "spashtcare",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/server",
+    "packages/client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=packages/server\" \"npm run dev --workspace=packages/client\"",
+    "install:all": "npm install",
+    "seed": "npm run seed --workspace=packages/server"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0"
+  }
+}

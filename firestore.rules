@@ -1,0 +1,65 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for governance & access control
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isPatientOrLinkedCaregiver(patientId) {
+      let patientData = get(/databases/$(database)/documents/patients/$(patientId)).data;
+      return isAuthenticated() && (
+        request.auth.uid == patientId ||
+        request.auth.uid in patientData.linkedCaregiverIds
+      );
+    }
+
+    // Patients collection
+    match /patients/{patientId} {
+      allow read, write: if isAuthenticated() && (
+        request.auth.uid == patientId ||
+        request.auth.uid in resource.data.linkedCaregiverIds
+      );
+    }
+
+    // Cases collection & nested subcollections
+    match /cases/{caseId} {
+      allow read, write: if isAuthenticated() && (
+        request.auth.uid == resource.data.patientId ||
+        isPatientOrLinkedCaregiver(resource.data.patientId)
+      );
+
+      match /medicines/{medicineId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /flags/{flagId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /timelineEvents/{eventId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /adherenceLogs/{logId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /symptomNotes/{noteId} {
+        allow read, write: if isAuthenticated();
+      }
+
+      match /escalations/{escalationId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // Audit-only consentEvents log (no PII, write-only or read by owner)
+    match /consentEvents/{eventId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.patientId;
+      allow update, delete: if false; // immutable audit log
+    }
+  }
+}
