@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=packages/server\" \"npm run dev --workspace=packages/client\"",
+    "build": "npm run build --workspace=packages/server && npm run build --workspace=packages/client",
+    "start": "npm run start --workspace=packages/server",
     "install:all": "npm install",
     "seed": "npm run seed --workspace=packages/server"
   },
