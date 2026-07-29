@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, Bot, User, X, Maximize2, Minimize2, Volume2, ShieldAlert, Pill, Stethoscope, Salad, AlertTriangle, Cpu } from 'lucide-react';
 import { PatientCaseFullData } from '../patientDataMap';
+import { getApiUrl } from '../apiConfig';
 
 interface Props {
   isOpen?: boolean;
@@ -66,7 +67,7 @@ export const AIChatModal: React.FC<Props> = ({ isOpen, onClose, patientData, cas
     setLoading(true);
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const response = await fetch(getApiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

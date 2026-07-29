@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CreditCard, Download, Share2 } from 'lucide-react';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
 import { PatientCaseFullData } from '../../patientDataMap';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   data?: PatientCaseFullData;
@@ -60,7 +61,7 @@ export const EmergencyCardScreen: React.FC<Props> = ({ data, patient }) => {
 
         <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl shadow-xl overflow-hidden max-w-md w-full border border-slate-300 dark:border-slate-700">
           <img
-            src={`/api/cases/${patientId}/emergency-card-svg?mode=${mode}`}
+            src={getApiUrl(`/api/cases/${patientId}/emergency-card-svg?mode=${mode}`)}
             alt={`Emergency Card for ${pName}`}
             className="w-full h-auto rounded-xl shadow-xs"
           />
@@ -68,7 +69,7 @@ export const EmergencyCardScreen: React.FC<Props> = ({ data, patient }) => {
 
         <div className="flex items-center gap-3 pt-2">
           <a
-            href={`/api/cases/${patientId}/emergency-card-svg?mode=${mode}`}
+            href={getApiUrl(`/api/cases/${patientId}/emergency-card-svg?mode=${mode}`)}
             download={`Emergency_Card_${pName.replace(/\s+/g, '_')}_${mode}.svg`}
             className="bg-gradient-to-r from-teal-700 to-emerald-600 hover:from-teal-800 hover:to-emerald-700 text-white font-black text-xs px-5 py-3 rounded-xl shadow-md flex items-center gap-2 transition active:scale-95 cursor-pointer"
           >

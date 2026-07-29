@@ -3,6 +3,7 @@ import { Activity, ShieldAlert, Pill, Calendar, HeartPulse, User, Phone, ArrowRi
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
 import { ConfidenceBadge } from '../../components/ConfidenceBadge';
 import { Patient } from '../../types';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   data: any;
@@ -27,7 +28,7 @@ export const CaseOverviewScreen: React.FC<Props> = ({ data, onNavigate }) => {
   const generateSummary = async () => {
     setIsGeneratingSummary(true);
     try {
-      const res = await fetch('/api/ai/discharge-summary', {
+      const res = await fetch(getApiUrl('/api/ai/discharge-summary'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ patient, medicines, diagnosis: 'Hypertension & Type 2 Diabetes Mellitus' })

@@ -23,6 +23,8 @@ import { AIChatModal } from './components/AIChatModal';
 import { Patient } from './types';
 import { PATIENT_DATA_MAP, PatientCaseFullData } from './patientDataMap';
 
+import { getApiUrl } from './apiConfig';
+
 const INITIAL_PATIENTS: Patient[] = Object.values(PATIENT_DATA_MAP).map(d => d.patient);
 
 export function App() {
@@ -54,7 +56,7 @@ export function App() {
   } : null);
 
   useEffect(() => {
-    fetch('/api/cases')
+    fetch(getApiUrl('/api/cases'))
       .then(r => r.json())
       .then(data => {
         if (data.cases && data.cases.length > 0) {
@@ -77,7 +79,7 @@ export function App() {
   ) => {
     let assignedPatientId = newPatient.patient_id;
     try {
-      const res = await fetch('/api/cases', {
+      const res = await fetch(getApiUrl('/api/cases'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

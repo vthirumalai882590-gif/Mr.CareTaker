@@ -3,6 +3,7 @@ import { ShieldCheck, Eye, FileText, Upload, Cpu, Sparkles, X, Image as ImageIco
 import { ConfidenceBadge } from '../../components/ConfidenceBadge';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
 import { useTheme } from '../../context/ThemeContext';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   data?: any;
@@ -129,7 +130,7 @@ export const TrustReceiptScreen: React.FC<Props> = ({ onNavigateToReplay }) => {
       formData.append('image', file);
       formData.append('case_id', 'case-001');
 
-      const response = await fetch('/api/documents/upload', {
+      const response = await fetch(getApiUrl('/api/documents/upload'), {
         method: 'POST',
         body: formData,
       });
