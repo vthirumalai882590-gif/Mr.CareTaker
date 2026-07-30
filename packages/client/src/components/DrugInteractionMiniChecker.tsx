@@ -1,12 +1,14 @@
-﻿import React, { useState, useRef, useEffect } from "react";
-import { FlaskConical, Search, X, CheckCircle2, ArrowLeftRight, Zap, ChevronDown, ChevronUp, Pill, Plus } from "lucide-react";
-import { INTERACTION_DB, lookupInteraction, SEVERITY_CONFIG, PRIORITY_CONFIG, InteractionRecord } from "../data/interactionDb";
+import React, { useState, useRef, useEffect } from "react";
+import { FlaskConical, Search, X, CheckCircle2, ArrowLeftRight, Zap, ChevronDown, ChevronUp, Pill, Plus, Info } from "lucide-react";
+import { INTERACTION_DB, lookupInteraction, SEVERITY_CONFIG, PRIORITY_CONFIG, InteractionRecord, BRAND_TO_GENERIC, getBrandMapping } from "../data/interactionDb";
 
 interface Props {
   currentMedicines: string[];
 }
 
-const KNOWN_DRUGS = Array.from(new Set(INTERACTION_DB.flatMap(r => [r.drugA, r.drugB]))).sort();
+const GENERIC_DRUGS = Array.from(new Set(INTERACTION_DB.flatMap(r => [r.drugA, r.drugB])));
+const BRAND_SUGGESTIONS = Object.entries(BRAND_TO_GENERIC).map(([brand, generic]) => `${brand.charAt(0).toUpperCase() + brand.slice(1)} (${generic})`);
+const KNOWN_DRUGS = Array.from(new Set([...GENERIC_DRUGS, ...BRAND_SUGGESTIONS])).sort();
 
 const SICON: Record<string, string> = {
   PHONE: "PH", BP: "BP", DOC: "DOC", PILL: "RX", LAB: "LAB", CAL: "CAL",
@@ -34,12 +36,23 @@ const DrugInput: React.FC<{
 
   const handleChange = (v: string) => {
     onChange(v);
-    if (v.length >= 2) {
-      const f = KNOWN_DRUGS.filter(d => d.toLowerCase().startsWith(v.toLowerCase()));
-      setSugg(f.slice(0, 6));
+    if (v.length >= 1) {
+      const q = v.toLowerCase();
+      const f = KNOWN_DRUGS.filter(d => d.toLowerCase().includes(q));
+      setSugg(f.slice(0, 8));
       setOpen(f.length > 0);
     } else { setSugg([]); setOpen(false); }
   };
+
+  const handleSelectSuggestion = (s: string) => {
+    // If format is "Ecosprin (Aspirin)", extract "Ecosprin"
+    const cleaned = s.includes("(") ? s.split(" (")[0] : s;
+    onChange(cleaned);
+    setSugg([]);
+    setOpen(false);
+  };
+
+  const brandInfo = getBrandMapping(value);
 
   const ringColor = color === "violet" ? "focus:border-violet-400 focus:ring-violet-100" : "focus:border-teal-400 focus:ring-teal-100";
   const iconColor = color === "violet" ? "text-violet-400" : "text-teal-400";
@@ -47,13 +60,21 @@ const DrugInput: React.FC<{
 
   return (
     <div className="flex-1 min-w-0" ref={ref}>
-      <div className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border inline-block mb-1.5 ${labelColor}`}>{label}</div>
+      <div className="flex items-center justify-between mb-1.5">
+        <div className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border inline-block ${labelColor}`}>{label}</div>
+        {brandInfo.isBrand && (
+          <span className="text-[10px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-200 flex items-center gap-1">
+            <Info className="w-3 h-3 text-violet-500 shrink-0" />
+            Mapped to {brandInfo.genericName}
+          </span>
+        )}
+      </div>
       <div className="relative">
         <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${iconColor} pointer-events-none`} />
         <input
           type="text" value={value}
           onChange={e => handleChange(e.target.value)}
-          onFocus={() => { if (sugg.length > 0) setOpen(true); }}
+          onFocus={() => { if (value.length >= 1) handleChange(value); }}
           onKeyDown={e => { if (e.key === "Enter" && onEnter) onEnter(); if (e.key === "Escape") setOpen(false); }}
           placeholder={placeholder}
           className={`w-full pl-9 pr-8 py-3 text-sm rounded-xl border-2 border-slate-200 outline-none font-semibold transition focus:ring-2 ${ringColor} placeholder-slate-400`}
@@ -64,12 +85,14 @@ const DrugInput: React.FC<{
           </button>
         )}
         {open && sugg.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
             {sugg.map(s => (
-              <button key={s} onMouseDown={() => { onChange(s); setSugg([]); setOpen(false); }}
-                className={`w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-${color}-50 hover:text-${color}-700 flex items-center gap-2 border-b border-slate-100 last:border-0 transition`}>
-                <Pill className={`w-3.5 h-3.5 ${iconColor} shrink-0`} />
-                {s}
+              <button key={s} onMouseDown={() => handleSelectSuggestion(s)}
+                className={`w-full text-left px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 flex items-center justify-between gap-2 border-b border-slate-100 last:border-0 transition`}>
+                <div className="flex items-center gap-2 truncate">
+                  <Pill className={`w-3.5 h-3.5 ${iconColor} shrink-0`} />
+                  <span className="truncate">{s}</span>
+                </div>
               </button>
             ))}
           </div>
