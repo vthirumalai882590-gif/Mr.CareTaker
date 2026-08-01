@@ -20,7 +20,23 @@ import { startReminderScheduler } from './services/reminders/scheduler';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+const allowedOrigins = [
+  'https://mr-care-taker-client.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || origin.endsWith('.vercel.app')) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true
+}));
+
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
@@ -37,7 +53,15 @@ app.use('/api/consent', consentRouter);
 app.use('/api/whatsapp', whatsappRouter);
 app.use('/api/ai', aiRouter);
 
-// Health check
+// Health checks
+app.get('/healthz', (_req, res) => {
+  res.status(200).send('ok');
+});
+
+app.get('/api/ping', (_req, res) => {
+  res.status(200).send('pong');
+});
+
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
