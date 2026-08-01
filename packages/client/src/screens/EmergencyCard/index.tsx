@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CreditCard, Download, Share2 } from 'lucide-react';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
 import { PatientCaseFullData } from '../../patientDataMap';
@@ -11,9 +11,17 @@ interface Props {
 
 export const EmergencyCardScreen: React.FC<Props> = ({ data, patient }) => {
   const [mode, setMode] = useState<'lockscreen' | 'wallet'>('lockscreen');
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
   const activePatient = data?.patient || patient;
   const patientId = activePatient?.patient_id || 'patient-ramesh-kumar';
   const pName = activePatient?.name || 'Patient';
+
+  useEffect(() => {
+    setImageLoading(true);
+    setImageError(false);
+  }, [mode, patientId]);
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 font-sans text-slate-900 dark:text-slate-100">
@@ -59,11 +67,33 @@ export const EmergencyCardScreen: React.FC<Props> = ({ data, patient }) => {
           SVG RENDERING PREVIEW ({mode.toUpperCase()}) — {pName}
         </div>
 
-        <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl shadow-xl overflow-hidden max-w-md w-full border border-slate-300 dark:border-slate-700">
+        <div className="relative bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl shadow-xl overflow-hidden max-w-md w-full border border-slate-300 dark:border-slate-700 min-h-[300px] flex items-center justify-center">
+          {imageLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50/90 dark:bg-slate-950/90 z-10 space-y-2">
+              <div className="w-8 h-8 border-4 border-teal-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-[10px] text-slate-500 font-bold">Generating SVG Medical Card...</span>
+            </div>
+          )}
+          {imageError && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-slate-50 dark:bg-slate-950 z-10 space-y-2">
+              <span className="text-xl">⚠️</span>
+              <span className="text-xs text-rose-500 font-extrabold">Failed to load Emergency Card SVG.</span>
+              <span className="text-[10px] text-slate-400">The server may be waking up from a cold start. Click below to download or retry.</span>
+            </div>
+          )}
           <img
             src={getApiUrl(`/api/cases/${patientId}/emergency-card-svg?mode=${mode}`)}
             alt={`Emergency Card for ${pName}`}
-            className="w-full h-auto rounded-xl shadow-xs"
+            onLoad={() => {
+              setImageLoading(false);
+              setImageError(false);
+            }}
+            onError={() => {
+              setImageLoading(false);
+              setImageError(true);
+            }}
+            key={`${mode}-${patientId}`}
+            className={`w-full h-auto rounded-xl shadow-xs transition-opacity duration-300 ${imageLoading || imageError ? 'opacity-0' : 'opacity-100'}`}
           />
         </div>
 
