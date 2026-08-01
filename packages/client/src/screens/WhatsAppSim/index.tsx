@@ -4,6 +4,7 @@ import { ConfidenceBadge } from '../../components/ConfidenceBadge';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
 import { SUPPORTED_LANGUAGES, TRANSLATIONS, LanguageCode } from '../../translations';
 import { PatientCaseFullData } from '../../patientDataMap';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   onOpenDashboard: (screen: string) => void;
@@ -397,7 +398,7 @@ export const WhatsAppSimScreen: React.FC<Props> = ({ onOpenDashboard, data }) =>
     setIsProcessing(true);
 
     try {
-      const response = await fetch('/api/whatsapp/message', {
+      const response = await fetch(getApiUrl('/api/whatsapp/message'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ case_id: 'case-001', message: msgText, phone: activeContact.phone || '916385808165' })

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Trash2, Users, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   data?: any;
@@ -26,7 +27,7 @@ export const GovernanceScreen: React.FC<Props> = ({ data }) => {
     if (deleteInput !== 'DELETE') return;
     setDeleting(true);
     try {
-      const res = await fetch('/api/cases/case-001/delete', {
+      const res = await fetch(getApiUrl('/api/cases/case-001/delete'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });

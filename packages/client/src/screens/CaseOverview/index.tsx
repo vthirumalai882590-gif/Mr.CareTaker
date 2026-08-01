@@ -387,7 +387,7 @@ export const CaseOverviewScreen: React.FC<Props> = ({ data, onNavigate }) => {
             onClick={async () => {
               try {
                 const firstMed = medicines[0] || { name: 'Amlodipine', dosage: '5 mg', frequency: 'Once daily (Morning)' };
-                const res = await fetch('/api/whatsapp/send-reminder', {
+                const res = await fetch(getApiUrl('/api/whatsapp/send-reminder'), {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -441,7 +441,7 @@ export const CaseOverviewScreen: React.FC<Props> = ({ data, onNavigate }) => {
                 <button
                   onClick={async () => {
                     try {
-                      const res = await fetch('/api/whatsapp/send-reminder', {
+                      const res = await fetch(getApiUrl('/api/whatsapp/send-reminder'), {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Settings as SettingsIcon, ShieldCheck, Trash2, Globe, Bell, Lock, Palette, Check } from 'lucide-react';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
 import { useTheme, THEMES, ThemeName } from '../../context/ThemeContext';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   data?: any;
@@ -18,7 +19,7 @@ export const SettingsScreen: React.FC<Props> = ({ data }) => {
     }
     setDeleting(true);
     try {
-      const res = await fetch('/api/consent/delete-data', {
+      const res = await fetch(getApiUrl('/api/consent/delete-data'), {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ case_id: 'case-001' })

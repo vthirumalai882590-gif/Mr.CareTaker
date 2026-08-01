@@ -176,7 +176,7 @@ export function App() {
     setSelectedPatientId(assignedPatientId);
 
     // Trigger Outbound WhatsApp Welcome & Onboarding message
-    fetch('/api/whatsapp/send-reminder', {
+    fetch(getApiUrl('/api/whatsapp/send-reminder'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

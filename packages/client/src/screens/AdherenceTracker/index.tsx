@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HeartPulse, CheckCircle2, XCircle, RefreshCw, Plus, Send, Clock, X } from 'lucide-react';
 import { DisclaimerBanner } from '../../components/DisclaimerBanner';
+import { getApiUrl } from '../../apiConfig';
 
 interface Props {
   data?: any;
@@ -124,7 +125,7 @@ export const AdherenceTrackerScreen: React.FC<Props> = ({ data }) => {
 
   const handleUpdateAdherence = async (eventId: string, newStatus: 'done' | 'missed') => {
     try {
-      await fetch('/api/cases/case-001/adherence', {
+      await fetch(getApiUrl('/api/cases/case-001/adherence'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ event_id: eventId, status: newStatus }),
@@ -170,7 +171,7 @@ export const AdherenceTrackerScreen: React.FC<Props> = ({ data }) => {
 
   const handleSendWhatsAppRefillAlert = async (refill: RefillItem) => {
     try {
-      await fetch('/api/whatsapp/send-reminder', {
+      await fetch(getApiUrl('/api/whatsapp/send-reminder'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
