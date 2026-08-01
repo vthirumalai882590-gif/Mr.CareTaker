@@ -148,28 +148,44 @@ npm run install:all
 ```
 
 ### 2. Configure Environment Variables
-Create a `.env` file in `packages/server/.env`:
+Create a `.env` file in the **repository root** (SpashtCare/.env):
 ```env
-PORT=5000
-NODE_ENV=development
-GEMINI_API_KEY=your_google_gemini_api_key_here
+PORT=3001
+GEMINI_API_KEY=your_gemini_api_key_here
 GROQ_API_KEY=your_groq_api_key_here
-WHATSAPP_TOKEN=your_meta_whatsapp_token_here
-WHATSAPP_PHONE_ID=your_whatsapp_phone_number_id_here
+WHATSAPP_VERIFY_TOKEN=spashtcare_webhook_verify_token
+WHATSAPP_API_TOKEN=your_whatsapp_cloud_api_token_here
+WHATSAPP_PHONE_NUMBER_ID=your_whatsapp_phone_number_id_here
+WHATSAPP_RECIPIENT_PHONE=your_whatsapp_recipient_phone_number_here
+FIREBASE_PROJECT_ID=spashtcare-firebase-project
+FIREBASE_CLIENT_EMAIL=your_firebase_client_email@spashtcare.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nyour_private_key\n-----END PRIVATE KEY-----\n"
 ```
+> [!NOTE]
+> The backend server loads the `.env` configuration from the workspace root. The default ports are **3001** for the Express API server and **5173** for the Vite React frontend.
 
 ### 3. Seed Database
 ```bash
-# Populate local SQLite database with clinical cases and drug registries
+# Populate local JSON database with clinical cases and drug registries
 npm run seed
 ```
+> [!TIP]
+> **Database Self-Seeding**: The backend automatically self-seeds itself with demo data on startup if the database file `spashtcare.json` is missing or empty. Manual seeding is optional.
 
 ### 4. Run Development Server
 ```bash
-# Launches Express API Server (Port 5000) & Vite React Client (Port 3000) concurrently
+# Launches Express API Server (Port 3001) & Vite React Client (Port 5173) concurrently
 npm run dev
 ```
-Open your browser and navigate to **`http://localhost:3000`**.
+Open your browser and navigate to **`http://localhost:5173`**.
+
+---
+
+### 🌐 Local WhatsApp Webhook Testing
+`start_ngrok.js`, `start_tunnel.js`, and `ngrok_url.txt` are developer utility scripts used exclusively for establishing tunnels to local webhooks during WhatsApp API testing. They are dev-only and have no role in the production deployment pipeline.
+
+### 🚀 Render Free-Tier Production Notice
+The production backend is hosted on Render's free tier (`mr-caretaker.onrender.com`). Render automatically spins down the service after 15 minutes of inactivity. When visiting the live demo for the first time, please allow 30–60 seconds for the backend container to wake up. We recommend pinging the server's health check endpoints (`/healthz` or `/api/ping`) a few minutes before starting a live presentation.
 
 ---
 
