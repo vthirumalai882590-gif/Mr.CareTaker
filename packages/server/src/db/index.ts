@@ -38,6 +38,8 @@ let store: MemoryStore = {
   consent_records: {},
 };
 
+let isSeeding = false;
+
 function loadStore() {
   if (fs.existsSync(DB_FILE)) {
     try {
@@ -45,6 +47,20 @@ function loadStore() {
       store = JSON.parse(data);
     } catch (e) {
       console.warn('[DB] Failed to load JSON store, starting fresh');
+    }
+  }
+
+  const hasPatients = store.patients && Object.keys(store.patients).length > 0;
+  if (!hasPatients && !isSeeding) {
+    isSeeding = true;
+    console.log('[DB] Database file is empty or missing. Auto-seeding initial demo data...');
+    try {
+      require('./seed');
+      console.log('[DB] Database auto-seeded successfully.');
+    } catch (err) {
+      console.error('[DB] Failed to auto-seed database:', err);
+    } finally {
+      isSeeding = false;
     }
   }
 }
